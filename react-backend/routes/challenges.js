@@ -6,13 +6,15 @@ router.get('/', function(req, res, next) {
 		id: 1,
 		name: "Challenge 1",
 		answer: "Test",
-		clue: "This is the first challenge"
+		clue: "This is the first challenge",
+		cstatus: "Done"
 	},
 	{
 		id: 2,
 		name: "Challenge 2",
 		answer: "Test 2",
-		clue: "This is the second challenge"
+		clue: "This is the second challenge",
+		cstatus: "In Progress"
 	}]);
 });
 
