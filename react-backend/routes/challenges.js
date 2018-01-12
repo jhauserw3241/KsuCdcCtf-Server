@@ -18,4 +18,6 @@ router.get('/', function(req, res, next) {
 	}]);
 });
 
+// Return name, number, clue if completed, and status (completed/in progress)
+
 module.exports = router;
