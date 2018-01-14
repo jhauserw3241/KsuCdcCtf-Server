@@ -1,7 +1,7 @@
 var express = require('express');
 var router = express.Router();
 
-/* router.get('/', function(req, res, next) {
+router.get('/', function(req, res, next) {
 	res.json([{
 		id: 1,
 		name: "jhauser",
@@ -17,8 +17,9 @@ var router = express.Router();
 		name: "richardp",
 		score: "90"
 	}]);
-}); */
+});
 
+/*
 // Return eids and total points
 router.get('/scoreboard', function(req, res) {
   var results = [];
@@ -31,6 +32,6 @@ router.get('/scoreboard', function(req, res) {
   
   res.contentType('application/json');
   res.send(JSON.stringify(results));
-});
+});*/
 
 module.exports = router;
