@@ -18,4 +18,15 @@ router.get('/', function(req, res, next) {
 	}]);
 });
 
+router.get('/:userId&:id&:flag', function(req, res, next) {
+	if((req.params.userId == "test") &&
+		(req.params.id == "2") &&
+		(req.params.flag == "Test 2")) {
+		res.json({'cstatus': 'Done'});
+	}
+	else {
+		res.json({'cstatus': 'Fail'});
+	}
+});
+
 module.exports = router;
