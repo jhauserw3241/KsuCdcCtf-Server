@@ -5,10 +5,6 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
-var scoreboard = require('./routes/scoreboard');
-var challenges = require('./routes/challenges');
-var login = require('./routes/login');
-
 var app = express();
 
 // view engine setup
@@ -23,10 +19,28 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', scoreboard);
-app.use('/scoreboard', scoreboard);
-app.use('/challenges', challenges);
-app.use('/login', login);
+app.get('/', function(req, res) {
+	res.redirect('/scoreboard');
+});
+app.get('/scoreboard', function(req, res) {
+	res.json([{
+		id: 1,
+		name: "jhauser",
+		score: "45"
+	},
+	{
+		id: 2,
+		name: "flemingcaleb",
+		score: "70"
+	},
+	{
+		id: 3,
+		name: "richardp",
+		score: "90"
+	}]);
+});
+//app.use('/challenges', challenges);
+//app.use('/login', login);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
