@@ -5,8 +5,6 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 
-var index = require('./routes/index');
-var users = require('./routes/users');
 var scoreboard = require('./routes/scoreboard');
 var challenges = require('./routes/challenges');
 var login = require('./routes/login');
@@ -25,8 +23,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.use('/', index);
-app.use('/users', users);
+app.use('/', scoreboard);
 app.use('/scoreboard', scoreboard);
 app.use('/challenges', challenges);
 app.use('/login', login);
