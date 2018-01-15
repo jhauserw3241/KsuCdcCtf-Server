@@ -22,7 +22,7 @@ db.connect()
 });
 
 // Return eids and total points
-router.get('/scoreboard', function(req, res) {
+router.get('/', function(req, res) {
   var results = [];
   db.any('select eid, score from users order by score desc;')
   .then(data => {
