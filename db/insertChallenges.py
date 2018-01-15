@@ -9,6 +9,6 @@ db = psycopg2.connect("dbname='scoreboard'")
 c = db.cursor()
 
 for ch in challenges.keys():
-  c.execute('insert into challenges (name, num, flag, clue) values (%s, %s, %s, %s)', (challenges[ch], ch, hashlib.md5((challenges[ch] + 'thisislikesalt').encode('utf-8')).hexdigest(), "c" + str(ch)))
+  c.execute('insert into challenges (name, num, flag, clue, points) values (%s, %s, %s, %s, %s)', (challenges[ch], ch, hashlib.md5((challenges[ch] + 'thisislikesalt').encode('utf-8')).hexdigest(), "c" + str(ch), 10))
 
 db.commit()
