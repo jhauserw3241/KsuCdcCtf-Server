@@ -1,25 +1,25 @@
 var express = require('express');
 var router = express.Router();
+var pgp = require('pg-promise')();
 
-/*
-router.get('/', function(req, res, next) {
-	res.json([{
-		id: 1,
-		name: "jhauser",
-		score: "45"
-	},
-	{
-		id: 2,
-		name: "flemingcaleb",
-		score: "70"
-	},
-	{
-		id: 3,
-		name: "richardp",
-		score: "90"
-	}]);
+// Database connecty code
+var cn = {
+  host: 'localhost',
+  port: 5432,
+  database: 'scoreboard',
+  user: 'postgres',
+  password: 'CHANGEME'
+};
+
+var db = pgp(cn);
+db.connect()
+    .then(function (obj) {
+        obj.done();
+        console.log("successful connection to db");
+    })
+    .catch(function (error) {
+        console.log("ERROR:", error.message || error);
 });
-*/
 
 // Return eids and total points
 router.get('/scoreboard', function(req, res) {
