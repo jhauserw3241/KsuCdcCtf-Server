@@ -2,8 +2,9 @@ var express = require('express');
 var router = express.Router();
 
 router.get('/:username&:password', function(req, res, next) {
-	if((req.params.username === "test") &&
-		(req.params.password === "test")) {
+	if((req.params.username === "loganprough") &&
+		(req.params.password === "loganprough")) {
+//    req.session.user_id = "test"; 
 		res.json({'success': true});
 	}
 	else {

@@ -29,9 +29,8 @@ router.get('/scoreboard', function(req, res) {
     for(var i = 0; i < data.length; i++) {
       results.push({eid: data[i].eid, score: data[i].score});
     }
-    console.log(JSON.stringify(results));
-    res.contentType('application/json');
-    res.send(JSON.stringify(results));
+    //console.log(JSON.stringify(results));
+    res.json(results);
   });
   
 });
