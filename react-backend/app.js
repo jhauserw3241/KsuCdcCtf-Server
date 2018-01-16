@@ -1,4 +1,5 @@
-var session = require('client-sessions');
+//var session = require('client-sessions');
+var session = require('express-session');
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
@@ -24,11 +25,17 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-app.use(session({
+/*app.use(session({
   cookieName: 'session',
   secret: 'CHANGEME',
   duration: 30 * 60 * 1000,
   activeDuration: 5 * 60 * 1000,
+  cookie: {}
+}));*/
+
+app.use(session({
+	secret: 'keyboard cat',
+	cookie: {}
 }));
 
 /*
@@ -62,7 +69,7 @@ app.get('/', function (req, res) {
 });
 
 app.get('/challenges', function(req, res) {
-  console.log("Logged in as " + req.session.user);
+  console.log("Logged in as " + req.session.user_id);
   var results = [];
   db.any('select num, name, clue, \'Done\' as cstatus from challenges;')
   .then(data => {
@@ -95,12 +102,19 @@ app.get('/submit/:userId&:flag', function(req, res, next) {
 });
 
 app.get('/login/:username&:password', function(req, res, next) {
-	if((req.params.username === "loganprough") &&
+	
+  if((req.params.username === "loganprough") &&
 		(req.params.password === "loganprough")) {
+    req.session.user_id = 67; //data[0].id;
+    res.json({'success': 'true'});
+    console.log("Successful login as " + req.session.user_id);
+    /*
     req.session.user = req.params.username;
     console.log("Successful login as " + req.session.user);
     res.json({'success': 'true'});
+    */
 	}
+  else res.json({'success': 'false'}); 
 });
 
 // Return eids and total points
