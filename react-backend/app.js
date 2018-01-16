@@ -62,8 +62,7 @@ app.get('/', function (req, res) {
 });
 
 app.get('/challenges', function(req, res) {
-  if (req.session && req.session.user) console.log("Logged in as " + req.session.user);
-  else console.log("Not logged in.");
+  console.log("Logged in as " + req.session.user);
   var results = [];
   db.any('select num, name, clue, \'Done\' as cstatus from challenges;')
   .then(data => {
