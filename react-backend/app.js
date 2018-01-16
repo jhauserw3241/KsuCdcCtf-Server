@@ -105,9 +105,13 @@ app.get('/login/:username&:password', function(req, res, next) {
 	
   if((req.params.username === "loganprough") &&
 		(req.params.password === "loganprough")) {
-    req.session.user_id = 67; //data[0].id;
-    res.json({'success': 'true'});
-    console.log("Successful login as " + req.session.user_id);
+    db.any('select 12 as number;')
+    .then(data => {
+      req.session.user_id = data[0].number; //data[0].id;
+      res.json({'success': 'true'});
+      console.log("Successful login as " + req.session.user_id);
+    });
+
     /*
     req.session.user = req.params.username;
     console.log("Successful login as " + req.session.user);
