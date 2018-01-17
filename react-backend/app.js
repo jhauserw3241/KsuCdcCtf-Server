@@ -7,15 +7,10 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var pgp = require('pg-promise')();
-/*
-var scoreboard = require('./routes/scoreboard');
-var challenges = require('./routes/challenges');
-var login = require('./routes/login');
-*/
+
 var app = express();
 
 // view engine setup
-app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'jade');
 
 // uncomment after placing your favicon in /public
@@ -29,21 +24,13 @@ app.use(express.static(path.join(__dirname, 'public')));
   cookieName: 'session',
   secret: 'CHANGEME',
   duration: 30 * 60 * 1000,
-  activeDuration: 5 * 60 * 1000,
-  cookie: {}
+  activeDuration: 5 * 60 * 1000
 }));*/
 
 app.use(session({
 	secret: 'keyboard cat',
 	cookie: {}
 }));
-
-/*
-app.use('/', scoreboard);
-app.use('/scoreboard', scoreboard);
-app.use('/challenges', challenges);
-app.use('/login', login);
-*/
 
 // Database connecty code
 var cn = {
