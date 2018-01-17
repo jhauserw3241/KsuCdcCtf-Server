@@ -81,36 +81,27 @@ app.get('/challenges', function(req, res) {
 
 });
 
-/*
-app.get('/:userId&:id&:flag', function(req, res, next) {
-	if((req.params.userId == "test") &&
-		(req.params.id == "2") &&
-		(req.params.flag == "Test 2")) {
-		res.json({'cstatus': 'Done'});
-	}
-	else {
-		res.json({'cstatus': 'Fail'});
-	}
-});
-*/
-
-app.get('/submit/:userId&:flag', function(req, res, next) {
+app.post('/submit/:userId&:flag', function(req, res, next) {
   db.any('select submitFlag(\'req.params.userId\', \'req.params.flag\'')
   .then(data => {
     res.json(data[0]);
   });
 });
 
-app.get('/login/:username&:password', function(req, res, next) {
+app.post('/login/:username&:password', function(req, res) {
 	
   if((req.params.username === "loganprough") &&
 		(req.params.password === "loganprough")) {
+	console.log("Before DB call");
     db.any('select 12 as number;')
     .then(data => {
-      req.session.user_id = data[0].number; //data[0].id;
-      res.json({'success': 'true'});
-      console.log("Successful login as " + req.session.user_id);
-    });
+		req.session.user_id = data[0].number; //data[0].id;
+		res.json({'success': 'true'});
+		console.log("Successful login as " + req.session.user_id);
+    })
+	.catch(error => {
+		res.json({'success': 'Something went wrong when trying to login'});
+	});
 
     /*
     req.session.user = req.params.username;
