@@ -64,7 +64,7 @@ app.get('/challenges', checkLogin, function(req, res) {
   db.any('select num, name, clue, points, case name when currentName($1) then \'In Progress\' else \'Done\' end as cstatus from challenges where num <= currentNum($1);', [req.session.user])
   .then(data => {
     for(var i = 0; i < data.length; i++) {
-      results.push({id: data[i].num, name: data[i].name, answer: data[i].answer, clue: data[i].clue, cstatus: data[i].cstatus});
+      results.push({id: data[i].num, name: data[i].name, points: data[i].points, clue: data[i].clue, cstatus: data[i].cstatus});
     }
     res.json(results);
   });
