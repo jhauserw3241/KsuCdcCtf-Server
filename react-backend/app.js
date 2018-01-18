@@ -1,5 +1,4 @@
-//var session = require('client-sessions');
-var session = require('express-session');
+var session = require('client-sessions');
 var express = require('express');
 var path = require('path');
 var favicon = require('serve-favicon');
@@ -20,16 +19,12 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-/*app.use(session({
+
+app.use(session({
   cookieName: 'session',
   secret: 'CHANGEME',
   duration: 30 * 60 * 1000,
   activeDuration: 5 * 60 * 1000
-}));*/
-
-app.use(session({
-	secret: 'keyboard cat',
-	cookie: {}
 }));
 
 // Database connecty code
@@ -56,7 +51,7 @@ app.get('/', function (req, res) {
 });
 
 app.get('/challenges', function(req, res) {
-  console.log("Logged in as " + req.session.user_id);
+  console.log("Logged in as " + req.session.user);
   var results = [];
   db.any('select num, name, clue, \'Done\' as cstatus from challenges;')
   .then(data => {
@@ -76,25 +71,10 @@ app.post('/submit/:userId&:flag', function(req, res, next) {
 });
 
 app.post('/login/:username&:password', function(req, res) {
-	
-  if((req.params.username === "loganprough") &&
-		(req.params.password === "loganprough")) {
-	console.log("Before DB call");
-    db.any('select 12 as number;')
-    .then(data => {
-		req.session.user_id = data[0].number; //data[0].id;
+  if (req.params.username === req.params.password) {
+		req.session.user = req.params.username;
 		res.json({'success': 'true'});
-		console.log("Successful login as " + req.session.user_id);
-    })
-	.catch(error => {
-		res.json({'success': 'Something went wrong when trying to login'});
-	});
-
-    /*
-    req.session.user = req.params.username;
-    console.log("Successful login as " + req.session.user);
-    res.json({'success': 'true'});
-    */
+		console.log("Successful login as " + req.session.user);
 	}
   else res.json({'success': 'false'}); 
 });
@@ -109,9 +89,7 @@ app.get('/scoreboard', function(req, res) {
     }
     res.json(results);
   });
-
 });
-
 
 
 // catch 404 and forward to error handler
