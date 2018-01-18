@@ -25,4 +25,12 @@ language sql;
 create or replace function currentName(varchar)
 returns varchar as 'select challenge from challenge_user where eid = $1;'
 language sql;
--- Simplify DB to not distinguish between user/admin
+
+create or replace function addFirstChallenge() returns trigger as $$ begin
+  insert into challenge_user (eid, challenge) values (new.eid, (select name from challenges where num = 1));
+return new; end;
+$$ language plpgsql;
+
+drop trigger if exists addFirstChallenge on users;
+create trigger addFirstChallenge after insert on users
+for each row execute procedure addFirstChallenge();
