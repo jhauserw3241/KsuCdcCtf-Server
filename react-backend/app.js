@@ -53,7 +53,7 @@ app.get('/', function (req, res) {
 app.get('/challenges', function(req, res) {
   console.log("Logged in as " + req.session.user);
   var results = [];
-  db.any('select num, name, clue, \'Done\' as cstatus from challenges;')
+  db.any('select num, name, clue, case name when currentName($1) then \'In Progress\' else \'Done\' end as cstatus from challenges where num <= currentNum($1);', [req.session.user])
   .then(data => {
     for(var i = 0; i < data.length; i++) {
       results.push({id: data[i].num, name: data[i].name, answer: data[i].answer, clue: data[i].clue, cstatus: data[i].cstatus});
