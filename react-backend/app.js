@@ -49,12 +49,12 @@ db.connect()
 
 // Scary AD authentication code
 process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
-var ActiveDirectory = require('activedirectory');
+//var ActiveDirectory = require('activedirectory');
 var config = { url: 'ldaps://ad.ksucdc.org',
                baseDN: 'dc=infra,dc=ksucdc,dc=org',
                username: 'LogansChallenge@infra.ksucdc.org',
                password: 'Test1234!'}
-var ad = new ActiveDirectory(config);
+//var ad = new ActiveDirectory(config);
 
 
 /*
@@ -89,7 +89,7 @@ app.post('/submit/:flag', function(req, res) {
 });
 
 app.post('/login/:username&:password', function(req, res) {
-  ad.authenticate(req.params.username, req.params.password, function(err, auth) {
+  /*ad.authenticate(req.params.username, req.params.password, function(err, auth) {
     //console.log(req.params.username + "   " + req.params.password);
     if (err) {
       console.log('ERROR: '+JSON.stringify(err));
@@ -102,14 +102,14 @@ app.post('/login/:username&:password', function(req, res) {
     else {
       console.log('Authentication failed!');
     }
-  });
+  });*/
 
-  /*  if (req.params.username === req.params.password) {
+	if (req.params.username === req.params.password) {
 		req.session.user = req.params.username;
 		res.json({'success': 'true'});
 		console.log("Successful login as " + req.session.user);
 	}
-  else res.json({'success': 'false'});  */
+	else res.json({'success': 'false'});
 });
 
 // Return eids and total points
