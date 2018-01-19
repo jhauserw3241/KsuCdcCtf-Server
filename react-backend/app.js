@@ -47,6 +47,16 @@ db.connect()
         console.log("ERROR:", error.message || error);
 });
 
+// Scary AD authentication code
+process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
+var ActiveDirectory = require('activedirectory');
+var config = { url: 'ldaps://ad.ksucdc.org',
+               baseDN: 'dc=infra,dc=ksucdc,dc=org',
+               username: 'LogansChallenge@infra.ksucdc.org',
+               password: 'Test1234!'}
+var ad = new ActiveDirectory(config);
+
+
 /*
 app.get('/', function (req, res) {
   res.redirect('/scoreboard');
@@ -79,12 +89,27 @@ app.post('/submit/:flag', function(req, res) {
 });
 
 app.post('/login/:username&:password', function(req, res) {
-  if (req.params.username === req.params.password) {
+  ad.authenticate(req.params.username, req.params.password, function(err, auth) {
+    //console.log(req.params.username + "   " + req.params.password);
+    if (err) {
+      console.log('ERROR: '+JSON.stringify(err));
+      return;
+    }
+
+    if (auth) {
+      console.log('Authenticated!');
+    }
+    else {
+      console.log('Authentication failed!');
+    }
+  });
+
+  /*  if (req.params.username === req.params.password) {
 		req.session.user = req.params.username;
 		res.json({'success': 'true'});
 		console.log("Successful login as " + req.session.user);
 	}
-  else res.json({'success': 'false'}); 
+  else res.json({'success': 'false'});  */
 });
 
 // Return eids and total points
