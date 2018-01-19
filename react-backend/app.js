@@ -48,15 +48,8 @@ db.connect()
         console.log("ERROR:", error.message || error);
 });
 
-// Scary AD authentication code
+// Ignore invalid AD cert signature
 process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
-var ActiveDirectory = require('activedirectory');
-var config = { url: 'ldaps://ad.ksucdc.org',
-               baseDN: 'CN=LogansChallenge,OU=Competitions,DC=infra,DC=ksucdc,DC=org',
-               username: 'lcdc@infra.ksucdc.org',
-               password: 'Test1234!'}
-var ad = new ActiveDirectory(config);
-
 
 app.get('/challenges', function(req, res) {
   console.log("Logged in as " + req.session.user);
@@ -78,57 +71,37 @@ app.post('/submit/:flag', function(req, res) {
   });
 });
 
-var username = 'loganprough';
-var password = 'temptest123456!';
-
 app.post('/login/:username&:password', function(req, res) {
-    var url = "ldap://ad.ksucdc.org";
-    var userPrincipalName = req.params.username + "@infra.ksucdc.org";
-    var passwd = req.params.password;
+  var url = "ldap://ad.ksucdc.org";
+  var userPrincipalName = req.params.username + "@infra.ksucdc.org";
+  var passwd = req.params.password;
+    
+  // Bind as the user
+  var adClient = ldap.createClient({ url: url });
+  adClient.bind(userPrincipalName, passwd, function(err) {
  
-    if (passwd === "") {
-        res.send("The empty password trick does not work here.");
-        return ;
-    }
- 
-    // Bind as the user
-    var adClient = ldap.createClient({ url: url });
-    adClient.bind(userPrincipalName, passwd, function(err) {
- 
-        if (err != null) {
-            if (err.name === "InvalidCredentialsError")
-                res.send("Credential error");
-            else
-                res.send("Unknown error: " + JSON.stringify(err));
-        } else {
-		req.session.user = req.params.username;
-		res.json({'success': 'true'});
-		console.log("Successful login as " + req.session.user);
-          console.log("IT WORKS"); }
-    });
-  
-  /*ad.authenticate(username, password, function(err, auth) {
-    console.log(req.params.username + "   " + req.params.password);
-    if (err) {
-      console.log('ERROR: '+JSON.stringify(err));
-      return;
-    }
-
-    if (auth) {
-      console.log('Authenticated!');
-    }
-    else {
-      console.log('Authentication failed!');
+  if (err != null) {
+    if (err.name === "InvalidCredentialsError")
+      res.send("Credential error");
+    else
+      res.send("Unknown error: " + JSON.stringify(err));
+    } else {
+	  	req.session.user = req.params.username;
+		  res.json({'success': 'true'});
+		  console.log("Successful login as " + req.session.user);
+      // Insert user into database if they don't exist
+      db.any('select addUser($1);', [req.session.user]);  
     }
   });
-*/
+  
 /*
 	if (req.params.username === req.params.password) {
 		req.session.user = req.params.username;
 		res.json({'success': 'true'});
 		console.log("Successful login as " + req.session.user);
 	}
-	else res.json({'success': 'false'});*/
+	else res.json({'success': 'false'});
+*/
 });
 
 // Return eids and total points

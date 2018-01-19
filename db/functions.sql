@@ -26,6 +26,14 @@ create or replace function currentName(varchar)
 returns varchar as 'select challenge from challenge_user where eid = $1;'
 language sql;
 
+-- Function to check if user exists and add if they don't
+create or replace function addUser(varchar) returns void as $$ begin
+if not exists (select * from users where eid = $1) then
+  insert into users (eid) values ($1);
+end if;
+end; $$ language plpgsql;
+
+-- Trigger to put entry in challenge_user if no row exists
 create or replace function addFirstChallenge() returns trigger as $$ begin
   insert into challenge_user (eid, challenge) values (new.eid, (select name from challenges where num = 1));
 return new; end;
