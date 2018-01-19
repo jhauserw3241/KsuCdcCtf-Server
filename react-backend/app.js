@@ -7,6 +7,7 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var pgp = require('pg-promise')();
+var ldap = require('ldapjs');
 
 var app = express();
 
@@ -52,7 +53,7 @@ process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
 var ActiveDirectory = require('activedirectory');
 var config = { url: 'ldaps://ad.ksucdc.org',
                baseDN: 'CN=LogansChallenge,OU=Competitions,DC=infra,DC=ksucdc,DC=org',
-               username: 'LogansChallenge@infra.ksucdc.org',
+               username: 'lcdc@infra.ksucdc.org',
                password: 'Test1234!'}
 var ad = new ActiveDirectory(config);
 
@@ -77,9 +78,37 @@ app.post('/submit/:flag', function(req, res) {
   });
 });
 
+var username = 'loganprough';
+var password = 'temptest123456!';
+
 app.post('/login/:username&:password', function(req, res) {
-  ad.authenticate(req.params.username, req.params.password, function(err, auth) {
-    //console.log(req.params.username + "   " + req.params.password);
+    var url = "ldap://ad.ksucdc.org";
+    var userPrincipalName = req.params.username + "@infra.ksucdc.org";
+    var passwd = req.params.password;
+ 
+    if (passwd === "") {
+        res.send("The empty password trick does not work here.");
+        return ;
+    }
+ 
+    // Bind as the user
+    var adClient = ldap.createClient({ url: url });
+    adClient.bind(userPrincipalName, passwd, function(err) {
+ 
+        if (err != null) {
+            if (err.name === "InvalidCredentialsError")
+                res.send("Credential error");
+            else
+                res.send("Unknown error: " + JSON.stringify(err));
+        } else {
+		req.session.user = req.params.username;
+		res.json({'success': 'true'});
+		console.log("Successful login as " + req.session.user);
+          console.log("IT WORKS"); }
+    });
+  
+  /*ad.authenticate(username, password, function(err, auth) {
+    console.log(req.params.username + "   " + req.params.password);
     if (err) {
       console.log('ERROR: '+JSON.stringify(err));
       return;
@@ -92,6 +121,7 @@ app.post('/login/:username&:password', function(req, res) {
       console.log('Authentication failed!');
     }
   });
+*/
 /*
 	if (req.params.username === req.params.password) {
 		req.session.user = req.params.username;
