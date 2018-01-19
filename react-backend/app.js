@@ -72,7 +72,7 @@ app.post('/submit/:flag', function(req, res) {
 });
 
 app.post('/login/:username&:password', function(req, res) {
-  var url = "ldap://ad.ksucdc.org";
+  var url = "ldaps://ad.ksucdc.org";
   var userPrincipalName = req.params.username + "@infra.ksucdc.org";
   var passwd = req.params.password;
     
