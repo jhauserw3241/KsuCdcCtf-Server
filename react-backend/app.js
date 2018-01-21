@@ -68,8 +68,8 @@ app.post('/submit/:flag', function(req, res) {
     res.json(data[0]);
   })
   .catch(function (error) {
-    res.json({'status': 'Error connecting to database.'};
-  }
+    res.json({'status': 'Error connecting to database.'});
+  });
 });
 
 app.post('/login/:username&:password', function(req, res) {
