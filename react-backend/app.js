@@ -74,6 +74,7 @@ app.get('/challenges', checkLogin, function(req, res) {
   db.any('select num, name, clue, points, case name when currentName($1) then \'In Progress\' else \'Done\' end as cstatus from challenges where num <= currentNum($1);', [req.session.user])
   .then(data => {
     for(var i = 0; i < data.length; i++) {
+		console.log(data[i].points);
       results.push({id: data[i].num, name: data[i].name, points: data[i].points, clue: data[i].clue, cstatus: data[i].cstatus});
     }
     res.json(results);
@@ -111,6 +112,15 @@ app.post('/login/:username&:password', function(req, res) {
 	}
 	else res.json({'success': 'false'});
 });
+
+app.post('/signout', function(req, res) {
+	req.session.user = "";
+	res.json({'success': 'true'});
+});
+
+/*app.get('/isloggedin', function(req, res) {
+	return req.session.user != "";
+});*/
 
 // Return eids and total points
 app.get('/scoreboard', function(req, res) {
