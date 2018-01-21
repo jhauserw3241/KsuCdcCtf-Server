@@ -52,7 +52,6 @@ db.connect()
 process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
 
 app.get('/challenges', function(req, res) {
-  console.log("Logged in as " + req.session.user);
   var results = [];
   db.any('select num, name, clue, points, case name when currentName($1) then \'In Progress\' else \'Done\' end as cstatus from challenges where num <= currentNum($1);', [req.session.user])
   .then(data => {
@@ -61,7 +60,6 @@ app.get('/challenges', function(req, res) {
     }
     res.json(results);
   });
-
 });
 
 app.post('/submit/:flag', function(req, res) {
@@ -72,36 +70,24 @@ app.post('/submit/:flag', function(req, res) {
 });
 
 app.post('/login/:username&:password', function(req, res) {
-  var url = "ldaps://ad.ksucdc.org";
-  var userPrincipalName = req.params.username + "@infra.ksucdc.org";
-  var passwd = req.params.password;
-    
-  // Bind as the user
-  var adClient = ldap.createClient({ url: url });
-  adClient.bind(userPrincipalName, passwd, function(err) {
- 
-  if (err != null) {
-    if (err.name === "InvalidCredentialsError")
-      res.send("Credential error");
-    else
-      res.send("Unknown error: " + JSON.stringify(err));
-    } else {
+  /*
+  var adClient = ldap.createClient({ url: "ldaps://ad.ksucdc.org" });
+  adClient.bind(req.params.username + "@infra.ksucdc.org", req.params.password, function(err) {
+    if (err != null) res.json({'success': 'false'});
+    else {
 	  	req.session.user = req.params.username;
-		  res.json({'success': 'true'});
-		  console.log("Successful login as " + req.session.user);
-      // Insert user into database if they don't exist
+	    res.json({'success': 'true'});
       db.any('select addUser($1);', [req.session.user]);  
     }
   });
-  
-/*
+  */
 	if (req.params.username === req.params.password) {
 		req.session.user = req.params.username;
 		res.json({'success': 'true'});
 		console.log("Successful login as " + req.session.user);
+    db.any('select addUser($1);', [req.session.user]);  
 	}
 	else res.json({'success': 'false'});
-*/
 });
 
 // Return eids and total points
