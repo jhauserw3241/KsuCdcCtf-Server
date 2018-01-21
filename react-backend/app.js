@@ -63,10 +63,13 @@ app.get('/challenges', function(req, res) {
 });
 
 app.post('/submit/:flag', function(req, res) {
-  db.any('select submitFlag($1, $2) as result;', [req.session.user, req.params.flag])
+  db.any('select submitFlag($1, $2) as status;', [req.session.user, req.params.flag])
   .then(data => {
     res.json(data[0]);
-  });
+  })
+  .catch(function (error) {
+    res.json({'status': 'Error connecting to database.'};
+  }
 });
 
 app.post('/login/:username&:password', function(req, res) {
