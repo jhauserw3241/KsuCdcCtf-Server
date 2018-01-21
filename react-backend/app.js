@@ -7,6 +7,7 @@ var logger = require('morgan');
 var cookieParser = require('cookie-parser');
 var bodyParser = require('body-parser');
 var pgp = require('pg-promise')();
+var ldap = require('ldapjs');
 
 var app = express();
 
@@ -47,29 +48,10 @@ db.connect()
         console.log("ERROR:", error.message || error);
 });
 
-// Scary AD authentication code
+// Ignore invalid AD cert signature
 process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
-//var ActiveDirectory = require('activedirectory');
-var config = { url: 'ldaps://ad.ksucdc.org',
-               baseDN: 'dc=infra,dc=ksucdc,dc=org',
-               username: 'LogansChallenge@infra.ksucdc.org',
-               password: 'Test1234!'}
-//var ad = new ActiveDirectory(config);
 
-
-/*
-app.get('/', function (req, res) {
-  res.redirect('/scoreboard');
-});
-*/
-
-var checkLogin = function(req, res, next) {
-  if (req.session.user) next();
-  else res.redirect('/login');
-}
-
-app.get('/challenges', checkLogin, function(req, res) {
-  console.log("Logged in as " + req.session.user);
+app.get('/challenges', function(req, res) {
   var results = [];
   db.any('select num, name, clue, points, case name when currentName($1) then \'In Progress\' else \'Done\' end as cstatus from challenges where num <= currentNum($1);', [req.session.user])
   .then(data => {
@@ -79,36 +61,35 @@ app.get('/challenges', checkLogin, function(req, res) {
     }
     res.json(results);
   });
-
 });
 
 app.post('/submit/:flag', function(req, res) {
-  db.any('select submitFlag($1, $2) as result;', [req.session.user, req.params.flag])
+  db.any('select submitFlag($1, $2) as status;', [req.session.user, req.params.flag])
   .then(data => {
     res.json(data[0]);
-  });
+  })
+  .catch(function (error) {
+    res.json({'status': 'Error connecting to database.'};
+  }
 });
 
 app.post('/login/:username&:password', function(req, res) {
-  /*ad.authenticate(req.params.username, req.params.password, function(err, auth) {
-    //console.log(req.params.username + "   " + req.params.password);
-    if (err) {
-      console.log('ERROR: '+JSON.stringify(err));
-      return;
-    }
-
-    if (auth) {
-      console.log('Authenticated!');
-    }
+  /*
+  var adClient = ldap.createClient({ url: "ldaps://ad.ksucdc.org" });
+  adClient.bind(req.params.username + "@infra.ksucdc.org", req.params.password, function(err) {
+    if (err != null) res.json({'success': 'false'});
     else {
-      console.log('Authentication failed!');
+	  	req.session.user = req.params.username;
+	    res.json({'success': 'true'});
+      db.any('select addUser($1);', [req.session.user]);  
     }
-  });*/
-
+  });
+  */
 	if (req.params.username === req.params.password) {
 		req.session.user = req.params.username;
 		res.json({'success': 'true'});
 		console.log("Successful login as " + req.session.user);
+    db.any('select addUser($1);', [req.session.user]);  
 	}
 	else res.json({'success': 'false'});
 });
