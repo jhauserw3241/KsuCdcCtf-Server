@@ -99,10 +99,6 @@ app.post('/signout', function(req, res) {
 	res.json({'success': 'true'});
 });
 
-/*app.get('/isloggedin', function(req, res) {
-	return req.session.user != "";
-});*/
-
 // Return eids and total points
 app.get('/scoreboard', function(req, res) {
   var results = [];
