@@ -53,7 +53,7 @@ process.env['NODE_TLS_REJECT_UNAUTHORIZED'] = '0';
 
 app.get('/challenges', function(req, res) {
   var results = [];
-  db.any('select num, name, clue, points, case name when currentName($1) then \'In Progress\' else \'Done\' end as cstatus from challenges where num <= currentNum($1);', [req.session.user])
+  db.any('select num, name, clue, points, case name when (select challenge from users where eid = $1) then \'In Progress\' else \'Done\' end as cstatus from challenges where num <= currentNum($1);', [req.session.user])
   .then(data => {
     for(var i = 0; i < data.length; i++) {
 		console.log(data[i].points);
@@ -74,7 +74,6 @@ app.post('/submit/:flag', function(req, res) {
 });
 
 app.post('/login/:username&:password', function(req, res) {
-  /*
   var adClient = ldap.createClient({ url: "ldaps://ad.ksucdc.org" });
   adClient.bind(req.params.username + "@infra.ksucdc.org", req.params.password, function(err) {
     if (err != null) res.json({'success': 'false'});
@@ -84,14 +83,14 @@ app.post('/login/:username&:password', function(req, res) {
       db.any('select addUser($1);', [req.session.user]);  
     }
   });
-  */
+  /*
 	if (req.params.username === req.params.password) {
 		req.session.user = req.params.username;
 		res.json({'success': 'true'});
 		console.log("Successful login as " + req.session.user);
     db.any('select addUser($1);', [req.session.user]);  
 	}
-	else res.json({'success': 'false'});
+	else res.json({'success': 'false'});*/
 });
 
 app.post('/signout', function(req, res) {
@@ -102,7 +101,7 @@ app.post('/signout', function(req, res) {
 // Return eids and total points
 app.get('/scoreboard', function(req, res) {
   var results = [];
-  db.any('select eid, score from users order by score desc;')
+  db.any('select eid, score, (select string_agg(name, ', ') from challenges where num < currentNum(eid)) as completed from users order by score desc;')
   .then(data => {
     for(var i = 0; i < data.length; i++) {
       results.push({eid: data[i].eid, score: data[i].score});
